@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Planejamento Estratégico · Painel de Acessos</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f3f6f9;--card:#fff;--ink:#16303f;--mute:#5f7482;--line:#dde5ec;--brand:#0b6e8a;--brand2:#0a4f66;--chip:#e3f1f5;--doc:#2f6fd0;--sheet:#1e8e55;--folder:#c58a10;--alert:#c0392b}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1b23;--card:#172733;--ink:#e8f0f5;--mute:#93a8b5;--line:#27404f;--brand:#4cc2dd;--brand2:#0b6e8a;--chip:#1c3846;--doc:#6d9df0;--sheet:#4cc489;--folder:#e3b341;--alert:#ef7a6c}}
+:root[data-theme="dark"]{--bg:#0f1b23;--card:#172733;--ink:#e8f0f5;--mute:#93a8b5;--line:#27404f;--brand:#4cc2dd;--brand2:#0b6e8a;--chip:#1c3846;--doc:#6d9df0;--sheet:#4cc489;--folder:#e3b341;--alert:#ef7a6c}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.4}
+header{background:linear-gradient(135deg,var(--brand2),#0b6e8a);color:#fff;padding:28px 20px 56px}
+.wrap{max-width:1000px;margin:0 auto}
+header small{opacity:.85;letter-spacing:.08em;text-transform:uppercase;font-size:12px}
+header h1{margin:6px 0 4px;font-size:clamp(22px,4vw,32px)}
+header p{margin:0;opacity:.9;font-size:15px}
+.search{margin-top:-28px;position:relative}
+.search svg{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--mute)}
+.search input{width:100%;padding:16px 44px 16px 48px;font-size:16px;border:1px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink);box-shadow:0 6px 20px rgba(0,0,0,.12);outline:none}
+.search input:focus{border-color:var(--brand);box-shadow:0 0 0 3px color-mix(in srgb,var(--brand) 30%,transparent)}
+.clear{position:absolute;right:10px;top:50%;transform:translateY(-50%);border:0;background:var(--chip);color:var(--ink);width:28px;height:28px;border-radius:50%;cursor:pointer;display:none;font-size:16px}
+main{padding:24px 20px 40px}
+.count{color:var(--mute);font-size:13px;margin:0 0 6px}
+section{margin-top:22px}
+h2{font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--mute);margin:0 0 12px;display:flex;align-items:center;gap:8px}
+h2::after{content:"";flex:1;height:1px;background:var(--line)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+a.card{display:flex;align-items:center;gap:14px;padding:14px;background:var(--card);border:1px solid var(--line);border-radius:14px;text-decoration:none;color:var(--ink);transition:transform .12s,box-shadow .12s,border-color .12s}
+a.card:hover,a.card:focus-visible{transform:translateY(-2px);box-shadow:0 8px 18px rgba(0,0,0,.1);border-color:var(--brand);outline:none}
+.ico{flex:none;width:46px;height:46px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 14%,transparent);color:var(--c)}
+.ico svg{width:26px;height:26px}
+.t{font-weight:600;font-size:15px}
+.k{font-size:12px;color:var(--mute);margin-top:2px}
+.empty{display:none;text-align:center;color:var(--mute);padding:40px 0}
+footer{text-align:center;color:var(--mute);font-size:12px;padding:0 20px 28px}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+<small>Secretaria da Saúde</small>
+<h1>Planejamento Estratégico</h1>
+<p>Painéis, planilhas e pastas do setor em um só lugar.</p>
+</div></header>
+<div class="wrap" style="padding:0 20px">
+<div class="search">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+<input id="q" type="search" placeholder="Buscar: glosa, APS, habilitação, contatos…" autocomplete="off" aria-label="Buscar acessos">
+<button class="clear" id="x" aria-label="Limpar busca">×</button>
+</div>
+</div>
+<main><div class="wrap">
+<p class="count" id="n"></p>
+<section data-s><h2>Painéis</h2><div class="grid" id="g1"></div></section>
+<section data-s><h2>Arquivos e pastas</h2><div class="grid" id="g2"></div></section>
+<div class="empty" id="e">Nenhum acesso encontrado. Tente outra palavra-chave.</div>
+</div></main>
+<footer>Painel de acessos · Área de Planejamento Estratégico</footer>
+<script>
+var I={
+dash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
+sheet:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M4 9h16M4 15h16M10 3v18"/></svg>',
+doc:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>',
+folder:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
+phone:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>'};
+var L='https://datastudio.google.com/u/2/reporting/';
+var D=[
+{g:1,t:'Painel Indicadores',i:'dash',c:'--brand',u:L+'237a9fc0-aa18-499c-b703-24a4fe52c0b6/page/p_0hdzfrs61d',k:'indicadores metas desempenho looker studio'},
+{g:1,t:'Glosas e-SUS',i:'dash',c:'--alert',u:L+'41e6452a-480d-4715-b34b-76efc13dcfbc/page/page_12345',k:'glosas esus e-sus inconsistências produção'},
+{g:1,t:'Pagamento APS',i:'dash',c:'--sheet',u:L+'089af104-d6ad-4b9c-82fa-aed306bbee38/page/page_12345',k:'pagamento aps atenção primária financiamento previne brasil'},
+{g:1,t:'Habilitações',i:'dash',c:'--doc',u:L+'1d8793b7-36b6-46e2-9f1d-9115e336a845/page/page_12345',k:'habilitações habilitacao credenciamento serviços'},
+{g:1,t:'Publicações',i:'dash',c:'--folder',u:L+'d9fb1c18-55e6-482a-9f97-b22019032696/page/page_12345',k:'publicações portarias diário oficial'},
+{g:1,t:'Morbidade Hospitalar',i:'dash',c:'--brand',u:L+'54f04892-9315-4269-9ad4-afaf8ad2c8f0/page/page_12345',k:'morbidade hospitalar internações sih'},
+{g:2,t:'Planilha Dados',i:'sheet',c:'--sheet',u:'https://docs.google.com/spreadsheets/d/1b1DZAZKk2x1HEmS8HbdxNnc0kA32o1u1Q2oRNOZBsYA/edit?usp=drivesdk',k:'planilha dados excel base sheets'},
+{g:2,t:'Ficha de Qualificação',i:'doc',c:'--doc',u:'https://docs.google.com/document/d/1PERDr6vpmHnr9oYFJlM0b9IyQATkIlipJhbf0juHQVs/edit?usp=drivesdk',k:'ficha qualificação indicador documento docs'},
+{g:2,t:'Pasta Dados Repositório',i:'folder',c:'--folder',u:'https://drive.google.com/drive/folders/1EPdMPEBHeFe4a79H8lJ79O7CgURNUFDZ',k:'pasta dados repositório drive arquivos'},
+{g:2,t:'Pasta Prestação de Contas',i:'folder',c:'--folder',u:'https://drive.google.com/drive/folders/1l62jrkZbR2fsk1gyMyz-K6k9Miuz-ZyA',k:'pasta prestação de contas relatório drive'},
+{g:2,t:'Contatos de Emergência',i:'phone',c:'--alert',u:'https://docs.google.com/spreadsheets/d/15SjS-O2y-tbfvQTAQygzRJW_oSz78ZF49C8WMxigVlk/edit?usp=drivesdk',k:'contatos emergência telefones ramais lista'}
+];
+var tipo={dash:'Painel',sheet:'Planilha',doc:'Documento',folder:'Pasta',phone:'Planilha'};
+function norm(s){return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')}
+D.forEach(function(d){
+var a=document.createElement('a');a.className='card';a.href=d.u;a.target='_blank';a.rel='noopener noreferrer';
+a.style.setProperty('--c','var('+d.c+')');
+a.innerHTML='<div class="ico">'+I[d.i]+'</div><div><div class="t">'+d.t+'</div><div class="k">'+tipo[d.i]+'</div></div>';
+d.el=a;d.n=norm(d.t+' '+d.k+' '+tipo[d.i]);
+document.getElementById('g'+d.g).appendChild(a);
+});
+var q=document.getElementById('q'),x=document.getElementById('x');
+function f(){
+var v=norm(q.value.trim()).split(/\s+/).filter(Boolean),s=0;
+D.forEach(function(d){var ok=v.every(function(w){return d.n.indexOf(w)>-1});d.el.style.display=ok?'':'none';if(ok)s++});
+document.querySelectorAll('[data-s]').forEach(function(sec){
+sec.style.display=sec.querySelector('a.card:not([style*="none"])')?'':'none'});
+document.getElementById('e').style.display=s?'none':'block';
+document.getElementById('n').textContent=v.length?s+' resultado(s)':D.length+' acessos disponíveis';
+x.style.display=q.value?'block':'none';
+}
+q.addEventListener('input',f);
+x.addEventListener('click',function(){q.value='';f();q.focus()});
+f();
+</script>
+</body>
+</html>
